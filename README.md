@@ -1,5 +1,11 @@
 # Docker VPN Gate
 
+[![Build Status](https://img.shields.io/github/actions/workflow/status/roydvs/docker-vpn-gate/docker-publish.yaml?logo=github)](https://github.com/roydvs/docker-vpn-gate/actions/workflows/docker-publish.yaml)
+[![GHCR](https://img.shields.io/badge/ghcr.io-roydvs%2Fdocker--vpn--gate-blue?logo=github)](https://github.com/roydvs/docker-vpn-gate/pkgs/container/docker-vpn-gate)
+[![License](https://img.shields.io/github/license/roydvs/docker-vpn-gate)](LICENSE)
+[![Last Sync](https://img.shields.io/github/last-commit/roydvs/docker-vpn-gate?path=servers.csv&label=last%20sync)](servers.csv)
+
+
 A lightweight Alpine-based container that automatically connects to [VPN Gate](https://www.vpngate.net/) and exposes the connection via SOCKS5 and HTTP proxies.
 
 ## Features
