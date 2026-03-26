@@ -50,12 +50,12 @@ prepare_vpn_config() {
             return 1
         fi
 
-        local selected_node=$(echo "$raw_data" | \
-            sort -t',' -k3 -nr | head -n 20 | shuf -n 1)
+        local selected_node=$(echo "$raw_data" | sort -t',' -k3 -nr | head -n 20 | shuf -n 1)
 
         if [ -n "$SERVER_IP" ]; then
             echo "Try to find the server config: $SERVER_IP"
             local tmp_selected_node=$(echo "$raw_data" | grep "$SERVER_IP")
+            local tmp_selected_node=$(echo "$raw_data" | awk -F',' -v ip="$SERVER_IP" '$2 == ip {print; exit}')
             if [ -n "$tmp_selected_node" ]; then
                 selected_node="$tmp_selected_node"
             else
@@ -81,12 +81,20 @@ prepare_vpn_config() {
         echo "$b64_config" | base64 -d > "$TMP_OVPN"
     fi
 
-    printf "\n<auth-user-pass>\nvpn\nvpn\n</auth-user-pass>\n" >> "$TMP_OVPN"
-    printf "\ndata-ciphers AES-256-GCM:AES-128-GCM:CHACHA20-POLY1305:AES-128-CBC\n" >> "$TMP_OVPN"
-    printf "\ndata-ciphers-fallback AES-128-CBC\n" >> "$TMP_OVPN"
-    printf "\nverify-x509-name opengw.net name\n" >> "$TMP_OVPN"
-    printf "\nremote-cert-tls server\n" >> "$TMP_OVPN"
-    printf "\nauth-nocache\n" >> "$TMP_OVPN"
+    printf "\n" >> "$TMP_OVPN"
+    printf "<auth-user-pass>\nvpn\nvpn\n</auth-user-pass>\n" >> "$TMP_OVPN"
+    printf "auth-nocache\n" >> "$TMP_OVPN"
+
+    printf "\n" >> "$TMP_OVPN"
+    printf "data-ciphers AES-256-GCM:AES-128-GCM:CHACHA20-POLY1305:AES-128-CBC\n" >> "$TMP_OVPN"
+    printf "data-ciphers-fallback AES-128-CBC\n" >> "$TMP_OVPN"
+    printf "verify-x509-name opengw.net name\n" >> "$TMP_OVPN"
+    printf "remote-cert-tls server\n" >> "$TMP_OVPN"
+
+    printf "\n" >> "$TMP_OVPN"
+    printf "pull-filter ignore \"ifconfig-ipv6\"\n" >> "$TMP_OVPN"
+    printf "pull-filter ignore \"route-ipv6\"\n" >> "$TMP_OVPN"
+    printf "block-ipv6\n" >> "$TMP_OVPN"
 
     return 0
 }
@@ -95,6 +103,17 @@ mkdir -p /dev/net
 [ -c /dev/net/tun ] || mknod /dev/net/tun c 10 200
 
 trap cleanup INT TERM
+
+iptables -F INPUT
+
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -i eth0 -j ACCEPT
+iptables -A INPUT -i tun0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i tun0 -j DROP
+
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT ACCEPT
 
 start_daemon microsocks -p "$SOCKS_PORT" -i 0.0.0.0
 HTTP_PROXY_CONFIG="/tmp/tinyproxy.conf"
@@ -137,6 +156,9 @@ while true; do
                 break
             fi
         fi
+        if ! pgrep openvpn > /dev/null; then
+            break
+        fi
         sleep 1
     done
 
@@ -150,7 +172,7 @@ while true; do
             exit 1
         fi
 
-        echo "Retry $CONN_RETRY_COUNT/$CONN_MAX_RETRIES: VPN Connection failed/timeout. Trying next node..."
+        echo "Retry $CONN_RETRY_COUNT/$CONN_MAX_RETRIES: VPN Connection failed/timeout. Retrying..."
         continue
     else
         CONN_RETRY_COUNT=0

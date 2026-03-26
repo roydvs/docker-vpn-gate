@@ -8,7 +8,7 @@ RUN git clone https://github.com/rofl0r/microsocks.git /tmp/microsocks && \
 
 FROM alpine:latest
 
-RUN apk add --no-cache openvpn curl ca-certificates iproute2 tinyproxy
+RUN apk add --no-cache openvpn curl ca-certificates iproute2 tinyproxy iptables
 
 COPY --from=builder /tmp/microsocks/microsocks /usr/local/bin/microsocks
 
