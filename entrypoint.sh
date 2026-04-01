@@ -127,15 +127,16 @@ while true; do
 
     if ! prepare_vpn_config; then
         CONFIG_RETRY_COUNT=$((CONFIG_RETRY_COUNT + 1))
+        echo "Retry $CONFIG_RETRY_COUNT/$CONFIG_MAX_RETRIES: Cannot prepare vpn config."
 
-        if [ "$CONFIG_RETRY_COUNT" -gt "$CONFIG_MAX_RETRIES" ]; then
+        if [ "$CONFIG_RETRY_COUNT" -ge "$CONFIG_MAX_RETRIES" ]; then
             echo "------------------------------------------------"
             echo "ERROR: Failed to fetch config after $CONFIG_MAX_RETRIES attempts."
             echo "------------------------------------------------"
             exit 1
         fi
 
-        echo "Retry $CONFIG_RETRY_COUNT/$CONFIG_MAX_RETRIES: Cannot prepare vpn config, retrying in 5s..."
+        echo "Retrying in 5s..."
         sleep 5
         continue
     else
@@ -161,15 +162,14 @@ while true; do
 
     if [ "$CONNECTED" = false ]; then
         CONN_RETRY_COUNT=$((CONN_RETRY_COUNT + 1))
+        echo "Retry $CONN_RETRY_COUNT/$CONN_MAX_RETRIES: VPN Connection failed/timeout."
 
-        if [ "$CONN_RETRY_COUNT" -gt "$CONN_MAX_RETRIES" ]; then
+        if [ "$CONN_RETRY_COUNT" -ge "$CONN_MAX_RETRIES" ]; then
             echo "------------------------------------------------"
             echo "ERROR: Failed to connect VPN server after $CONN_MAX_RETRIES attempts."
             echo "------------------------------------------------"
             exit 1
         fi
-
-        echo "Retry $CONN_RETRY_COUNT/$CONN_MAX_RETRIES: VPN Connection failed/timeout. Retrying..."
         continue
     else
         CONN_RETRY_COUNT=0
@@ -194,7 +194,7 @@ while true; do
             FAIL_COUNT=0
         fi
 
-        if [ "$FAIL_COUNT" -gt "$FAIL_MAX" ] || ! pgrep openvpn > /dev/null; then
+        if [ "$FAIL_COUNT" -ge "$FAIL_MAX" ] || ! pgrep openvpn > /dev/null; then
             echo "VPN Link is dead. Reconnecting..."
             break
         fi
