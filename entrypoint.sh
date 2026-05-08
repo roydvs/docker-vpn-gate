@@ -2,7 +2,7 @@
 set -e
 
 SERVER_IP="${SERVER_IP:-}"
-API_URL="${API_URL:-https://raw.githubusercontent.com/roydvs/docker-vpn-gate/main/servers.csv}"
+API_URL="${API_URL:-https://www.vpngate.net/api/iphone/}"
 SOCKS_PORT="${SOCKS_PORT:-1080}"
 HTTP_PORT="${HTTP_PORT:-8080}"
 OVPN_CONFIG="${OVPN_CONFIG:-/vpn/config.ovpn}"

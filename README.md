@@ -46,14 +46,14 @@ curl -x http://localhost:8080 https://www.cloudflare.com/cdn-cgi/trace
 | `SERVER_IP` | (empty) | Connect to a specific VPN IP. If empty, the highest-score server is chosen. |
 | `SOCKS_PORT`| `1080` | Internal port for Microsocks. |
 | `HTTP_PORT` | `8080` | Internal port for Tinyproxy. |
-| `API_URL`   | `https://raw.githubusercontent.com/roydvs/docker-vpn-gate/main/servers.csv` | VPN Gate server list API. |
+| `API_URL`   | `https://www.vpngate.net/api/iphone/` | VPN Gate server list API. |
 
 ### Reliability & Mirroring
 
 To ensure high availability in restricted network environments, this project includes a built-in GitHub Action that mirrors the VPN Gate server list.
 
-- **Default API Mirror**: `https://raw.githubusercontent.com/roydvs/docker-vpn-gate/main/servers.csv`
-- **Official API**: `https://www.vpngate.net/api/iphone/` (Use this by setting the `API_URL` environment variable if needed).
+- **Default API(Official)**: `https://www.vpngate.net/api/iphone/`
+- **API Mirror**: `https://raw.githubusercontent.com/roydvs/docker-vpn-gate/main/servers.csv` (Use this by setting the `API_URL` environment variable if needed).
 
 ### Advanced Usage
 
