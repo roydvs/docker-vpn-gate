@@ -96,6 +96,12 @@ prepare_vpn_config() {
     printf "pull-filter ignore \"route-ipv6\"\n" >> "$TMP_OVPN"
     printf "block-ipv6\n" >> "$TMP_OVPN"
 
+    printf "route 10.0.0.0 255.0.0.0 net_gateway\n" >> "$TMP_OVPN"
+    printf "route 100.64.0.0 255.192.0.0 net_gateway\n" >> "$TMP_OVPN"
+    printf "route 169.254.0.0 255.255.0.0 net_gateway\n" >> "$TMP_OVPN"
+    printf "route 172.16.0.0 255.240.0.0 net_gateway\n" >> "$TMP_OVPN"
+    printf "route 192.168.0.0 255.255.0.0 net_gateway\n" >> "$TMP_OVPN"
+    
     return 0
 }
 
